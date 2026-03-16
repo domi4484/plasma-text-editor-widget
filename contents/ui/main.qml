@@ -165,6 +165,70 @@ PlasmoidItem {
                         }
                     }
                     
+                    // Ctrl+Shift+Up/Down to move lines
+                    Keys.onPressed: (event) => {
+                        if ((event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.ShiftModifier)) {
+                            if (event.key === Qt.Key_Up) {
+                                moveLineUp()
+                                event.accepted = true
+                            } else if (event.key === Qt.Key_Down) {
+                                moveLineDown()
+                                event.accepted = true
+                            }
+                        }
+                    }
+                    
+                    function moveLineUp() {
+                        if (readOnly) return
+                        
+                        var cursor = cursorPosition
+                        var selStart = selectionStart
+                        var selEnd = selectionEnd
+                        
+                        // Get current line number
+                        var currentLine = text.substring(0, cursor).split('\n').length - 1
+                        
+                        if (currentLine === 0) return // Already at top
+                        
+                        var lines = text.split('\n')
+                        
+                        // Swap current line with previous
+                        var temp = lines[currentLine]
+                        lines[currentLine] = lines[currentLine - 1]
+                        lines[currentLine - 1] = temp
+                        
+                        text = lines.join('\n')
+                        
+                        // Restore cursor position (move up one line)
+                        var prevLineLength = lines[currentLine - 1].length
+                        cursorPosition = cursor - prevLineLength - 1
+                    }
+                    
+                    function moveLineDown() {
+                        if (readOnly) return
+                        
+                        var cursor = cursorPosition
+                        var selStart = selectionStart
+                        var selEnd = selectionEnd
+                        
+                        // Get current line number
+                        var currentLine = text.substring(0, cursor).split('\n').length - 1
+                        var lines = text.split('\n')
+                        
+                        if (currentLine === lines.length - 1) return // Already at bottom
+                        
+                        // Swap current line with next
+                        var temp = lines[currentLine]
+                        lines[currentLine] = lines[currentLine + 1]
+                        lines[currentLine + 1] = temp
+                        
+                        text = lines.join('\n')
+                        
+                        // Restore cursor position (move down one line)
+                        var nextLineLength = lines[currentLine + 1].length
+                        cursorPosition = cursor + nextLineLength + 1
+                    }
+                    
                     // Trigger auto-save timer on text change
                     onTextChanged: {
                         if (!readOnly && text !== textProvider.text) {
