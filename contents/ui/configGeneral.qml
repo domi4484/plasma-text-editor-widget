@@ -7,7 +7,7 @@ import org.kde.kcmutils as KCM
 
 KCM.SimpleKCM {
     property alias cfg_filePath: filePathField.text
-    property alias cfg_syntaxMode: syntaxModeField.text
+    property alias cfg_enableSyntaxHighlighting: syntaxHighlightingCheck.checked
     property alias cfg_readOnly: readOnlyCheck.checked
     property alias cfg_showLineNumbers: lineNumbersCheck.checked
     property alias cfg_wordWrap: wordWrapCheck.checked
@@ -15,20 +15,20 @@ KCM.SimpleKCM {
     Kirigami.FormLayout {
         RowLayout {
             Kirigami.FormData.label: "File path:"
-            
+
             QQC2.TextField {
                 id: filePathField
                 Layout.fillWidth: true
                 placeholderText: "/home/you/file.txt"
             }
-            
+
             QQC2.Button {
                 icon.name: "document-open"
                 text: "Browse..."
                 onClicked: fileDialog.open()
             }
         }
-        
+
         FileDialog {
             id: fileDialog
             title: "Select text file"
@@ -38,11 +38,10 @@ KCM.SimpleKCM {
             }
         }
 
-        QQC2.TextField {
-            id: syntaxModeField
-            Kirigami.FormData.label: "Syntax mode:"
-            placeholderText: "None"
-            enabled: false
+        QQC2.CheckBox {
+            id: syntaxHighlightingCheck
+            Kirigami.FormData.label: "Syntax highlighting:"
+            text: "Enable syntax highlighting"
         }
 
         QQC2.CheckBox {
@@ -55,7 +54,6 @@ KCM.SimpleKCM {
             id: lineNumbersCheck
             Kirigami.FormData.label: "Line numbers:"
             text: "Show line numbers"
-            enabled: false
         }
 
         QQC2.CheckBox {
@@ -70,7 +68,7 @@ KCM.SimpleKCM {
 
         QQC2.Label {
             Layout.fillWidth: true
-            text: "Note: Syntax highlighting and line numbers not yet implemented"
+            text: "Syntax highlighting auto-detects language from file extension"
             wrapMode: Text.WordWrap
             opacity: 0.7
         }
