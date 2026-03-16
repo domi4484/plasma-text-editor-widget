@@ -6,6 +6,8 @@ set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
 include(KDEInstallDirs)
 
+add_subdirectory(plugin)
+
 install(DIRECTORY contents
     DESTINATION ${KDE_INSTALL_DATADIR}/plasma/plasmoids/org.example.plasma.textwidget
 )
