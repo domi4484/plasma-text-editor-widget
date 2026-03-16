@@ -1,0 +1,21 @@
+{
+  "KPlugin": {
+    "Id": "org.example.plasma.textwidget",
+    "Name": "Text File Viewer",
+    "Description": "Show contents of a text file in a Plasma widget using KTextEditor",
+    "Icon": "accessories-text-editor",
+    "Version": "0.1.0",
+    "Website": "https://example.org",
+    "Authors": [
+      {
+        "Name": "You"
+      }
+    ],
+    "License": "GPL-2.0-or-later"
+  },
+  "X-Plasma-API-Minimum-Version": "6.0",
+  "X-Plasma-API": "declarativeappletscript",
+  "KPackageStructure": "Plasma/Applet",
+  "X-Plasma-MainScript": "contents/ui/main.qml",
+  "X-KDE-PluginInfo-Category": "Utilities"
+}
