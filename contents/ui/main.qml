@@ -205,15 +205,16 @@ PlasmoidItem {
                         if (readOnly) return
                         
                         var cursor = cursorPosition
-                        var selStart = selectionStart
-                        var selEnd = selectionEnd
-                        
-                        // Get current line number
-                        var currentLine = text.substring(0, cursor).split('\n').length - 1
+                        var textBefore = text.substring(0, cursor)
+                        var currentLine = textBefore.split('\n').length - 1
                         
                         if (currentLine === 0) return // Already at top
                         
                         var lines = text.split('\n')
+                        
+                        // Calculate cursor position within current line
+                        var lineStartPos = textBefore.lastIndexOf('\n') + 1
+                        var cursorInLine = cursor - lineStartPos
                         
                         // Swap current line with previous
                         var temp = lines[currentLine]
@@ -222,23 +223,27 @@ PlasmoidItem {
                         
                         text = lines.join('\n')
                         
-                        // Restore cursor position (move up one line)
-                        var prevLineLength = lines[currentLine - 1].length
-                        cursorPosition = cursor - prevLineLength - 1
+                        // Calculate new cursor position
+                        var newLineStartPos = 0
+                        for (var i = 0; i < currentLine - 1; i++) {
+                            newLineStartPos += lines[i].length + 1 // +1 for newline
+                        }
+                        cursorPosition = newLineStartPos + Math.min(cursorInLine, lines[currentLine - 1].length)
                     }
                     
                     function moveLineDown() {
                         if (readOnly) return
                         
                         var cursor = cursorPosition
-                        var selStart = selectionStart
-                        var selEnd = selectionEnd
-                        
-                        // Get current line number
-                        var currentLine = text.substring(0, cursor).split('\n').length - 1
+                        var textBefore = text.substring(0, cursor)
+                        var currentLine = textBefore.split('\n').length - 1
                         var lines = text.split('\n')
                         
                         if (currentLine === lines.length - 1) return // Already at bottom
+                        
+                        // Calculate cursor position within current line
+                        var lineStartPos = textBefore.lastIndexOf('\n') + 1
+                        var cursorInLine = cursor - lineStartPos
                         
                         // Swap current line with next
                         var temp = lines[currentLine]
@@ -247,9 +252,12 @@ PlasmoidItem {
                         
                         text = lines.join('\n')
                         
-                        // Restore cursor position (move down one line)
-                        var nextLineLength = lines[currentLine + 1].length
-                        cursorPosition = cursor + nextLineLength + 1
+                        // Calculate new cursor position
+                        var newLineStartPos = 0
+                        for (var i = 0; i < currentLine + 1; i++) {
+                            newLineStartPos += lines[i].length + 1 // +1 for newline
+                        }
+                        cursorPosition = newLineStartPos + Math.min(cursorInLine, lines[currentLine + 1].length)
                     }
                     
                     // Trigger auto-save timer on text change
