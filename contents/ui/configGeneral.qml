@@ -12,6 +12,7 @@ KCM.SimpleKCM {
     property alias cfg_showLineNumbers: lineNumbersCheck.checked
     property alias cfg_wordWrap: wordWrapCheck.checked
     property alias cfg_watchFileChanges: watchFileChangesCheck.checked
+    property alias cfg_fontSize: fontSizeSpinBox.value
 
     Kirigami.FormLayout {
         RowLayout {
@@ -67,6 +68,15 @@ KCM.SimpleKCM {
             id: watchFileChangesCheck
             Kirigami.FormData.label: "Auto-reload:"
             text: "Watch for external changes"
+        }
+
+        QQC2.SpinBox {
+            id: fontSizeSpinBox
+            Kirigami.FormData.label: "Font size:"
+            from: 6
+            to: 72
+            value: 10
+            stepSize: 1
         }
 
         Item {

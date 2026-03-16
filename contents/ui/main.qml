@@ -105,7 +105,7 @@ PlasmoidItem {
                         id: lineNumbersText
                         readOnly: true
                         font.family: textArea.font.family
-                        font.pointSize: textArea.font.pointSize
+                        font.pointSize: Plasmoid.configuration.fontSize
                         color: Kirigami.Theme.disabledTextColor
                         background: null
                         selectByMouse: false
@@ -144,8 +144,26 @@ PlasmoidItem {
                     readOnly: Plasmoid.configuration.readOnly
                     wrapMode: Plasmoid.configuration.wordWrap ? TextEdit.Wrap : TextEdit.NoWrap
                     font.family: "monospace"
+                    font.pointSize: Plasmoid.configuration.fontSize
                     selectByMouse: true
                     color: Kirigami.Theme.textColor
+                    
+                    // Ctrl + mouse wheel to zoom
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.NoButton
+                        
+                        onWheel: (wheel) => {
+                            if (wheel.modifiers & Qt.ControlModifier) {
+                                var newSize = Plasmoid.configuration.fontSize + (wheel.angleDelta.y > 0 ? 1 : -1)
+                                newSize = Math.max(6, Math.min(72, newSize))
+                                Plasmoid.configuration.fontSize = newSize
+                                wheel.accepted = true
+                            } else {
+                                wheel.accepted = false
+                            }
+                        }
+                    }
                     
                     // Trigger auto-save timer on text change
                     onTextChanged: {
