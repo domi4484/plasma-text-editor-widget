@@ -73,10 +73,22 @@ void TextProvider::saveFile(const QString &content)
         return;
     }
 
+    // Temporarily remove file from watcher to avoid triggering on our own save
+    bool wasWatching = false;
+    if (m_watchFile && m_watcher->files().contains(m_filePath)) {
+        m_watcher->removePath(m_filePath);
+        wasWatching = true;
+    }
+
     QFile f(m_filePath);
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
         m_error = QStringLiteral("Cannot write to file: %1").arg(m_filePath);
         emit errorChanged();
+        
+        // Re-add to watcher if it was being watched
+        if (wasWatching) {
+            m_watcher->addPath(m_filePath);
+        }
         return;
     }
 
@@ -87,6 +99,11 @@ void TextProvider::saveFile(const QString &content)
     // Update internal text to match saved content
     m_text = content;
     m_error.clear();
+    
+    // Re-add to watcher if it was being watched
+    if (wasWatching) {
+        m_watcher->addPath(m_filePath);
+    }
     
     emit textChanged();
     emit errorChanged();
