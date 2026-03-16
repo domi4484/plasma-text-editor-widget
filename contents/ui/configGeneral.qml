@@ -11,6 +11,7 @@ KCM.SimpleKCM {
     property alias cfg_readOnly: readOnlyCheck.checked
     property alias cfg_showLineNumbers: lineNumbersCheck.checked
     property alias cfg_wordWrap: wordWrapCheck.checked
+    property alias cfg_watchFileChanges: watchFileChangesCheck.checked
 
     Kirigami.FormLayout {
         RowLayout {
@@ -62,13 +63,19 @@ KCM.SimpleKCM {
             text: "Enable wrapping"
         }
 
+        QQC2.CheckBox {
+            id: watchFileChangesCheck
+            Kirigami.FormData.label: "Auto-reload:"
+            text: "Watch for external changes"
+        }
+
         Item {
             Kirigami.FormData.isSection: true
         }
 
         QQC2.Label {
             Layout.fillWidth: true
-            text: "Syntax highlighting auto-detects language from file extension"
+            text: "Syntax highlighting auto-detects language from file extension.\nAuto-reload will refresh the content when the file changes on disk."
             wrapMode: Text.WordWrap
             opacity: 0.7
         }

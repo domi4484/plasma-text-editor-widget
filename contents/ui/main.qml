@@ -11,6 +11,11 @@ PlasmoidItem {
     TextProvider {
         id: textProvider
         filePath: Plasmoid.configuration.filePath
+        watchFile: Plasmoid.configuration.watchFileChanges
+        
+        onFileChangedExternally: {
+            reloadNotification.show()
+        }
     }
 
     // Auto-save timer - triggers 1.5 seconds after last edit
@@ -205,5 +210,28 @@ PlasmoidItem {
         visible: textProvider.error.length > 0
         icon.name: "dialog-error"
         text: textProvider.error
+    }
+
+    // Reload notification when file changes externally
+    Kirigami.InlineMessage {
+        id: reloadNotification
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: Kirigami.Units.smallSpacing
+        type: Kirigami.MessageType.Information
+        text: "File reloaded (changed externally)"
+        visible: false
+        
+        function show() {
+            visible = true
+            hideReloadTimer.restart()
+        }
+        
+        Timer {
+            id: hideReloadTimer
+            interval: 3000
+            onTriggered: reloadNotification.visible = false
+        }
     }
 }

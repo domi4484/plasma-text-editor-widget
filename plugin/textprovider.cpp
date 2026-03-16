@@ -3,12 +3,17 @@
 #include <QFile>
 #include <QTextStream>
 
-TextProvider::TextProvider(QObject *parent) : QObject(parent) {}
+TextProvider::TextProvider(QObject *parent) : QObject(parent)
+{
+    m_watcher = new QFileSystemWatcher(this);
+    connect(m_watcher, &QFileSystemWatcher::fileChanged, this, &TextProvider::onFileChanged);
+}
 
 QString TextProvider::filePath() const { return m_filePath; }
 QString TextProvider::text() const { return m_text; }
 QString TextProvider::error() const { return m_error; }
 bool TextProvider::canSave() const { return !m_filePath.isEmpty(); }
+bool TextProvider::watchFile() const { return m_watchFile; }
 
 void TextProvider::setFilePath(const QString &path)
 {
@@ -17,7 +22,47 @@ void TextProvider::setFilePath(const QString &path)
     }
     m_filePath = path;
     emit filePathChanged();
+    updateWatcher();
     reload();
+}
+
+void TextProvider::setWatchFile(bool watch)
+{
+    if (m_watchFile == watch) {
+        return;
+    }
+    m_watchFile = watch;
+    emit watchFileChanged();
+    updateWatcher();
+}
+
+void TextProvider::onFileChanged(const QString &path)
+{
+    Q_UNUSED(path)
+    
+    // File was modified externally, reload it
+    reload();
+    emit fileChangedExternally();
+    
+    // Re-add to watcher (some editors remove and recreate files on save)
+    if (m_watchFile && !m_filePath.isEmpty()) {
+        if (!m_watcher->files().contains(m_filePath)) {
+            m_watcher->addPath(m_filePath);
+        }
+    }
+}
+
+void TextProvider::updateWatcher()
+{
+    // Remove all watched files
+    if (!m_watcher->files().isEmpty()) {
+        m_watcher->removePaths(m_watcher->files());
+    }
+    
+    // Add current file if watching is enabled
+    if (m_watchFile && !m_filePath.isEmpty() && QFile::exists(m_filePath)) {
+        m_watcher->addPath(m_filePath);
+    }
 }
 
 void TextProvider::saveFile(const QString &content)
