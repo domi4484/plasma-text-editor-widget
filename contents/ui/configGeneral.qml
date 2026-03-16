@@ -13,6 +13,7 @@ KCM.SimpleKCM {
     property alias cfg_wordWrap: wordWrapCheck.checked
     property alias cfg_watchFileChanges: watchFileChangesCheck.checked
     property alias cfg_fontSize: fontSizeSpinBox.value
+    property alias cfg_highlightCurrentLine: highlightCurrentLineCheck.checked
 
     Kirigami.FormLayout {
         RowLayout {
@@ -77,6 +78,12 @@ KCM.SimpleKCM {
             to: 72
             value: 10
             stepSize: 1
+        }
+
+        QQC2.CheckBox {
+            id: highlightCurrentLineCheck
+            Kirigami.FormData.label: "Current line:"
+            text: "Highlight current line"
         }
 
         Item {

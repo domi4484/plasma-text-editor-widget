@@ -148,6 +148,29 @@ PlasmoidItem {
                     selectByMouse: true
                     color: Kirigami.Theme.textColor
                     
+                    // Current line highlight
+                    Rectangle {
+                        id: currentLineHighlight
+                        visible: Plasmoid.configuration.highlightCurrentLine && textArea.activeFocus
+                        color: Kirigami.Theme.highlightColor
+                        opacity: 0.15
+                        z: -1
+                        
+                        property int currentLine: {
+                            var pos = textArea.cursorPosition
+                            return textArea.text.substring(0, pos).split('\n').length - 1
+                        }
+                        
+                        x: 0
+                        width: textArea.contentWidth > textArea.width ? textArea.contentWidth : textArea.width
+                        height: textArea.font.pixelSize * 1.3
+                        
+                        y: {
+                            var line = currentLineHighlight.currentLine
+                            return textArea.cursorRectangle.y
+                        }
+                    }
+                    
                     // Ctrl + mouse wheel to zoom
                     MouseArea {
                         anchors.fill: parent

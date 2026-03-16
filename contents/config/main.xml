@@ -27,5 +27,8 @@
     <entry name="fontSize" type="Int">
       <default>10</default>
     </entry>
+    <entry name="highlightCurrentLine" type="Bool">
+      <default>true</default>
+    </entry>
   </group>
 </kcfg>
