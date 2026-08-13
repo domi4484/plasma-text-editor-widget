@@ -37,9 +37,9 @@ sudo zypper in cmake ninja extra-cmake-modules \
 ```bash
 mkdir build
 cd build
-cmake .. -G Ninja
-cmake --build .
-sudo cmake --install .
+cmake . -B build/ -G Ninja
+cmake --build build
+sudo cmake --install build
 ```
 
 ### Reload Plasma
