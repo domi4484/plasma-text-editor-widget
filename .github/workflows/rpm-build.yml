@@ -20,6 +20,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Restore zypper package cache
         uses: actions/cache@v4
@@ -38,6 +41,7 @@ jobs:
           zypper --non-interactive modifyrepo --all --keep-packages
           zypper --non-interactive ref
           zypper --non-interactive in --no-recommends \
+            git \
             gcc-c++ \
             make \
             cmake \
@@ -52,12 +56,17 @@ jobs:
       - name: Determine version
         id: version
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+          IS_RELEASE_BUILD=true
           if [ "${{ github.event_name }}" = "release" ]; then
             RAW_TAG="${{ github.event.release.tag_name }}"
           elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
             RAW_TAG="${{ github.ref_name }}"
           else
-            RAW_TAG="v0.0.0"
+            # Not a release/tag build: base the version on the latest tag instead.
+            IS_RELEASE_BUILD=false
+            RAW_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           fi
           # RPM versions can't contain the "v" prefix (e.g. "v1.0.1" -> "1.0.1").
           VERSION="${RAW_TAG#v}"
@@ -65,7 +74,7 @@ jobs:
           # Non-release builds (plain branch pushes, manual runs) aren't tied to a
           # tag, so append the run number as a build number to tell them apart
           # (RPM versions can't contain "-", so "+" is used as the separator).
-          if [ "${{ github.event_name }}" != "release" ] && [[ "${{ github.ref }}" != refs/tags/* ]]; then
+          if [ "$IS_RELEASE_BUILD" = "false" ]; then
             VERSION="${VERSION}+${{ github.run_number }}"
           fi
 
