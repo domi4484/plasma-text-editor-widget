@@ -56,7 +56,12 @@ jobs:
       - name: Determine version
         id: version
         run: |
+          set -x
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          # Don't rely on actions/checkout's fetch-tags to have pulled every tag
+          # (observed unreliable in practice) - fetch them explicitly ourselves.
+          git fetch --tags --force origin
+          git tag --list
 
           IS_RELEASE_BUILD=true
           if [ "${{ github.event_name }}" = "release" ]; then
@@ -66,7 +71,7 @@ jobs:
           else
             # Not a release/tag build: base the version on the latest tag instead.
             IS_RELEASE_BUILD=false
-            RAW_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+            RAW_TAG=$(git describe --tags --abbrev=0) || RAW_TAG="v0.0.0"
           fi
           # RPM versions can't contain the "v" prefix (e.g. "v1.0.1" -> "1.0.1").
           VERSION="${RAW_TAG#v}"
