@@ -18,12 +18,10 @@ jobs:
       image: opensuse/tumbleweed:latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
+      # git must be installed before checkout runs: the base container image
+      # doesn't ship it, and without it actions/checkout silently falls back
+      # to a git-less tarball download (no .git directory at all), which
+      # breaks the tag-based versioning step further down.
       - name: Restore zypper package cache
         uses: actions/cache@v4
         with:
@@ -52,6 +50,12 @@ jobs:
             kf6-kpackage-devel \
             kf6-kcoreaddons-devel \
             kf6-ki18n-devel
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Determine version
         id: version
