@@ -85,7 +85,10 @@ PlasmoidItem {
             
             return syntaxMap[ext] || "None"
         }
-        theme: highlighter.repository ? highlighter.repository.defaultTheme(root.isDarkTheme ? Repository.DarkTheme : Repository.LightTheme) : null
+        // NOTE: use the global "Repository" singleton here, not highlighter.repository
+        // — that property defaults to null unless explicitly assigned, so a null check
+        // on it always took the null branch and silently dropped this theme entirely.
+        theme: Repository.defaultTheme(root.isDarkTheme ? Repository.DarkTheme : Repository.LightTheme)
     }
 
     Item {

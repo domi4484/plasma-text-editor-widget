@@ -35,9 +35,7 @@ sudo zypper in cmake ninja extra-cmake-modules \
 ### Build and Install
 
 ```bash
-mkdir build
-cd build
-cmake . -B build/ -G Ninja
+cmake -S . -B build -G Ninja
 cmake --build build
 sudo cmake --install build
 ```
