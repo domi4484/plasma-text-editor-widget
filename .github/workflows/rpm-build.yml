@@ -16,8 +16,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Restore zypper package cache
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/zypp/packages
+          # Unique key per run so a fresh cache is always saved (keeps it
+          # from going stale on rolling Tumbleweed), with prefix fallback
+          # to reuse the most recent previous cache.
+          key: zypp-packages-${{ github.run_id }}
+          restore-keys: |
+            zypp-packages-
+
       - name: Install dependencies via Zypper
         run: |
+          # Keep downloaded RPMs in /var/cache/zypp/packages so they can be cached.
+          zypper --non-interactive modifyrepo --all --keep-packages
           zypper --non-interactive ref
           zypper --non-interactive in --no-recommends \
             gcc-c++ \
