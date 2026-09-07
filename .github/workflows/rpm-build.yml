@@ -1,0 +1,47 @@
+name: Build Plasma Widget RPM (openSUSE)
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    tags: [ "v*" ]
+  workflow_dispatch:
+
+jobs:
+  build-rpm:
+    runs-on: ubuntu-latest
+    container:
+      image: opensuse/tumbleweed:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies via Zypper
+        run: |
+          zypper --non-interactive ref
+          zypper --non-interactive in --no-recommends \
+            gcc-c++ \
+            make \
+            cmake \
+            extra-cmake-modules \
+            rpm-build \
+            qt6-base-devel \
+            qt6-declarative-devel \
+            kf6-kpackage-devel \
+            kf6-kcoreaddons-devel \
+            kf6-ki18n-devel
+
+      - name: Build and Package RPM
+        run: |
+          mkdir build && cd build
+          cmake .. \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr
+          make -j$(nproc)
+          cpack -G RPM
+
+      - name: Upload RPM Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plasma-text-widget-rpm
+          path: build/*.rpm
