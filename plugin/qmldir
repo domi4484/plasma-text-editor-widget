@@ -1,2 +1,2 @@
-module org.example.plasma.textwidget
+module ch.customcut.plasma.textwidget
 plugin textwidgetplugin

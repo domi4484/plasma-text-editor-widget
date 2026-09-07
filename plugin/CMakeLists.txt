@@ -32,9 +32,9 @@ execute_process(
 )
 
 install(TARGETS textwidgetplugin
-    LIBRARY DESTINATION ${QT6_QML_DIR}/org/example/plasma/textwidget
+    LIBRARY DESTINATION ${QT6_QML_DIR}/${ORGANISATION_DOMAIN}/${ORGANISATION_NAME}/plasma/textwidget
 )
 
 install(FILES qmldir
-    DESTINATION ${QT6_QML_DIR}/org/example/plasma/textwidget
+    DESTINATION ${QT6_QML_DIR}/${ORGANISATION_DOMAIN}/${ORGANISATION_NAME}/plasma/textwidget
 )

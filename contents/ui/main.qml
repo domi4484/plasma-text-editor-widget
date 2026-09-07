@@ -3,7 +3,7 @@ import QtQuick.Controls as QQC2
 import org.kde.plasma.plasmoid
 import org.kde.kirigami as Kirigami
 import org.kde.syntaxhighlighting 1.0
-import org.example.plasma.textwidget 1.0
+import ch.customcut.plasma.textwidget 1.0
 
 PlasmoidItem {
     id: root
