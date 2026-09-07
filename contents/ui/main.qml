@@ -8,13 +8,12 @@ import ch.customcut.plasma.textwidget 1.0
 PlasmoidItem {
     id: root
 
-    // Tracks the actual system color scheme (the one KDE apps like Kate use),
-    // which is not always the same as the Plasma widget style Kirigami.Theme follows.
-    SystemPalette {
-        id: sysPalette
-        colorGroup: SystemPalette.Active
-    }
-    readonly property bool isDarkTheme: Kirigami.ColorUtils.brightnessForColor(sysPalette.base) === Kirigami.ColorUtils.Dark
+    // "Plasma Style" (shell/widgets) and "Application color scheme" (apps) can be set
+    // independently (e.g. KDE's day/night "twilight" auto-switching) and one can be dark
+    // while the other is light. Rather than guessing which one governs a given native
+    // control, the editor below explicitly paints both its background and its text from
+    // Kirigami.Theme, so they're always a matched, readable pair.
+    readonly property bool isDarkTheme: Kirigami.ColorUtils.brightnessForColor(Kirigami.Theme.backgroundColor) === Kirigami.ColorUtils.Dark
 
     TextProvider {
         id: textProvider
@@ -103,7 +102,7 @@ PlasmoidItem {
                 width: visible ? lineNumbersText.implicitWidth + Kirigami.Units.smallSpacing * 2 : 0
                 height: parent.height
                 visible: Plasmoid.configuration.showLineNumbers
-                color: sysPalette.alternateBase
+                color: Kirigami.Theme.alternateBackgroundColor
 
                 QQC2.ScrollView {
                     anchors.fill: parent
@@ -114,7 +113,7 @@ PlasmoidItem {
                         readOnly: true
                         font.family: textArea.font.family
                         font.pointSize: Plasmoid.configuration.fontSize
-                        color: Qt.rgba(sysPalette.text.r, sysPalette.text.g, sysPalette.text.b, 0.6)
+                        color: Kirigami.Theme.disabledTextColor
                         background: null
                         selectByMouse: false
                         padding: Kirigami.Units.smallSpacing
@@ -154,8 +153,11 @@ PlasmoidItem {
                     font.family: "monospace"
                     font.pointSize: Plasmoid.configuration.fontSize
                     selectByMouse: true
-                    color: sysPalette.text
-                    
+                    color: Kirigami.Theme.textColor
+                    background: Rectangle {
+                        color: Kirigami.Theme.backgroundColor
+                    }
+
                     // Current line highlight
                     Rectangle {
                         id: currentLineHighlight

@@ -22,7 +22,7 @@ install(FILES metadata.json
 # --- Configurazione CPack per pacchetto RPM ---
 set(CPACK_GENERATOR "RPM")
 set(CPACK_PACKAGE_NAME "plasma-text-widget")
-set(CPACK_PACKAGE_VERSION "1.0.0")
+set(CPACK_PACKAGE_VERSION "v1.0.1")
 set(CPACK_RPM_PACKAGE_RELEASE "1")
 set(CPACK_RPM_PACKAGE_LICENSE "GPL-3.0-or-later")
 set(CPACK_PACKAGE_CONTACT "Damiano Lombardi <damiano.lombardi@customcut.ch>")
