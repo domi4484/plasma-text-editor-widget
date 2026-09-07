@@ -55,8 +55,10 @@ jobs:
 
       - name: Determine version
         id: version
+        shell: bash
         run: |
           set -x
+          cd "$GITHUB_WORKSPACE"
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           # Don't rely on actions/checkout's fetch-tags to have pulled every tag
           # (observed unreliable in practice) - fetch them explicitly ourselves.
