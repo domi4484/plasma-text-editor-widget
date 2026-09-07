@@ -78,7 +78,11 @@ PlasmoidItem {
             
             return syntaxMap[ext] || "None"
         }
-        theme: highlighter.repository ? highlighter.repository.defaultTheme(Kirigami.Theme.colorSet === Kirigami.Theme.View ? 1 : 2) : null
+        theme: {
+            if (!highlighter.repository) return null
+            var isDark = Kirigami.ColorUtils.brightnessForColor(Kirigami.Theme.backgroundColor) === Kirigami.ColorUtils.Dark
+            return highlighter.repository.defaultTheme(isDark ? Repository.DarkTheme : Repository.LightTheme)
+        }
     }
 
     Item {
