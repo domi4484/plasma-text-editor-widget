@@ -8,6 +8,14 @@ import ch.customcut.plasma.textwidget 1.0
 PlasmoidItem {
     id: root
 
+    // Tracks the actual system color scheme (the one KDE apps like Kate use),
+    // which is not always the same as the Plasma widget style Kirigami.Theme follows.
+    SystemPalette {
+        id: sysPalette
+        colorGroup: SystemPalette.Active
+    }
+    readonly property bool isDarkTheme: Kirigami.ColorUtils.brightnessForColor(sysPalette.base) === Kirigami.ColorUtils.Dark
+
     TextProvider {
         id: textProvider
         filePath: Plasmoid.configuration.filePath
@@ -78,11 +86,7 @@ PlasmoidItem {
             
             return syntaxMap[ext] || "None"
         }
-        theme: {
-            if (!highlighter.repository) return null
-            var isDark = Kirigami.ColorUtils.brightnessForColor(Kirigami.Theme.backgroundColor) === Kirigami.ColorUtils.Dark
-            return highlighter.repository.defaultTheme(isDark ? Repository.DarkTheme : Repository.LightTheme)
-        }
+        theme: highlighter.repository ? highlighter.repository.defaultTheme(root.isDarkTheme ? Repository.DarkTheme : Repository.LightTheme) : null
     }
 
     Item {
@@ -99,7 +103,7 @@ PlasmoidItem {
                 width: visible ? lineNumbersText.implicitWidth + Kirigami.Units.smallSpacing * 2 : 0
                 height: parent.height
                 visible: Plasmoid.configuration.showLineNumbers
-                color: Kirigami.Theme.alternateBackgroundColor
+                color: sysPalette.alternateBase
 
                 QQC2.ScrollView {
                     anchors.fill: parent
@@ -110,7 +114,7 @@ PlasmoidItem {
                         readOnly: true
                         font.family: textArea.font.family
                         font.pointSize: Plasmoid.configuration.fontSize
-                        color: Kirigami.Theme.disabledTextColor
+                        color: Qt.rgba(sysPalette.text.r, sysPalette.text.g, sysPalette.text.b, 0.6)
                         background: null
                         selectByMouse: false
                         padding: Kirigami.Units.smallSpacing
@@ -150,7 +154,7 @@ PlasmoidItem {
                     font.family: "monospace"
                     font.pointSize: Plasmoid.configuration.fontSize
                     selectByMouse: true
-                    color: Kirigami.Theme.textColor
+                    color: sysPalette.text
                     
                     // Current line highlight
                     Rectangle {
