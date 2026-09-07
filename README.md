@@ -53,7 +53,7 @@ Or simply log out and log back in.
 
 ## License
 
-GPL-2.0-or-later
+GPL-3.0-or-later
 
 ## Contributing
 
