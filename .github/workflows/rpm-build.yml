@@ -20,9 +20,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
 
       - name: Restore zypper package cache
         uses: actions/cache@v4
@@ -52,12 +49,35 @@ jobs:
             kf6-kcoreaddons-devel \
             kf6-ki18n-devel
 
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            RAW_TAG="${{ github.event.release.tag_name }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            RAW_TAG="${{ github.ref_name }}"
+          else
+            RAW_TAG="v0.0.0"
+          fi
+          # RPM versions can't contain the "v" prefix (e.g. "v1.0.1" -> "1.0.1").
+          VERSION="${RAW_TAG#v}"
+
+          # Non-release builds (plain branch pushes, manual runs) aren't tied to a
+          # tag, so append the run number as a build number to tell them apart
+          # (RPM versions can't contain "-", so "+" is used as the separator).
+          if [ "${{ github.event_name }}" != "release" ] && [[ "${{ github.ref }}" != refs/tags/* ]]; then
+            VERSION="${VERSION}+${{ github.run_number }}"
+          fi
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
       - name: Build and Package RPM
         run: |
           mkdir build && cd build
           cmake .. \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX=/usr
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCPACK_PACKAGE_VERSION=${{ steps.version.outputs.version }}
           make -j$(nproc)
           cpack -G RPM
 
