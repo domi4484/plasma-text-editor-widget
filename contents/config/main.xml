@@ -19,7 +19,7 @@
       <default>false</default>
     </entry>
     <entry name="enableSyntaxHighlighting" type="Bool">
-      <default>false</default>
+      <default>true</default>
     </entry>
     <entry name="watchFileChanges" type="Bool">
       <default>true</default>
