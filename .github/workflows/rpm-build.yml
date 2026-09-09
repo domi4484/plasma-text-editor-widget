@@ -76,9 +76,12 @@ jobs:
           elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
             RAW_TAG="${{ github.ref_name }}"
           else
-            # Not a release/tag build: base the version on the latest tag instead.
+            # Not a release/tag build: base the version on the highest version tag.
+            # `git describe` uses commit ancestry and can pick an older tag if the
+            # newest one is not on the current branch history.
             IS_RELEASE_BUILD=false
-            RAW_TAG=$(git describe --tags --abbrev=0) || RAW_TAG="v0.0.0"
+            RAW_TAG=$(git tag --list 'v*' --sort=-version:refname | head -n 1) || RAW_TAG="v0.0.0"
+            [ -n "$RAW_TAG" ] || RAW_TAG="v0.0.0"
           fi
           # RPM versions can't contain the "v" prefix (e.g. "v1.0.1" -> "1.0.1").
           VERSION="${RAW_TAG#v}"
