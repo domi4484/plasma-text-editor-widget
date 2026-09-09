@@ -76,7 +76,7 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: "Font size:"
             from: 6
             to: 72
-            value: 10
+            value: 12
             stepSize: 1
         }
 
