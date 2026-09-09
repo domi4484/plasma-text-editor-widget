@@ -14,7 +14,7 @@ jobs:
   build-rpm:
     runs-on: ubuntu-latest
     container:
-      image: opensuse/tumbleweed:latest
+      image: opensuse/leap:16
 
     steps:
       # git must be installed before checkout runs: the base container image
