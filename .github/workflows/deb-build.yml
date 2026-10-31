@@ -1,0 +1,104 @@
+name: Build Plasma Widget DEB (Debian)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-deb:
+    runs-on: ubuntu-latest
+    container:
+      # Debian 13 ships Plasma 6 / KF6, which the widget requires.
+      image: debian:trixie
+
+    steps:
+      - name: Install dependencies via apt
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates \
+            git \
+            g++ \
+            make \
+            cmake \
+            extra-cmake-modules \
+            dpkg-dev \
+            file \
+            qmake6 \
+            qt6-base-dev \
+            qt6-declarative-dev \
+            libkf6i18n-dev
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Determine version
+        id: version
+        shell: bash
+        run: |
+          set -x
+          cd "$GITHUB_WORKSPACE"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git fetch --tags --force origin
+          git tag --list
+
+          IS_RELEASE_BUILD=true
+          if [ "${{ github.event_name }}" = "release" ]; then
+            RAW_TAG="${{ github.event.release.tag_name }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            RAW_TAG="${{ github.ref_name }}"
+          else
+            IS_RELEASE_BUILD=false
+            RAW_TAG=$(git tag --list 'v*' --sort=-version:refname | head -n 1) || RAW_TAG="v0.0.0"
+            [ -n "$RAW_TAG" ] || RAW_TAG="v0.0.0"
+          fi
+          # Debian versions can't start with "v" (e.g. "v1.0.1" -> "1.0.1").
+          VERSION="${RAW_TAG#v}"
+
+          # Non-release builds get the run number appended ("+" is valid in
+          # Debian upstream versions).
+          if [ "$IS_RELEASE_BUILD" = "false" ]; then
+            VERSION="${VERSION}+${{ github.run_number }}"
+          fi
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and Package DEB
+        run: |
+          mkdir build && cd build
+          cmake .. \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCPACK_PACKAGE_VERSION=${{ steps.version.outputs.version }}
+          make -j$(nproc)
+          cpack -G DEB
+
+      - name: Show package contents
+        run: |
+          dpkg-deb --info build/*.deb
+          dpkg-deb --contents build/*.deb
+
+      - name: Upload DEB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plasma-text-widget-deb
+          path: build/*.deb
+
+      - name: Attach DEB to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*.deb

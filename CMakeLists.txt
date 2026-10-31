@@ -35,4 +35,11 @@ set(CPACK_RPM_PACKAGE_LICENSE "GPL-3.0-or-later")
 set(CPACK_PACKAGE_CONTACT "Damiano Lombardi <damiano.lombardi@customcut.ch>")
 set(CPACK_RPM_PACKAGE_GROUP "System/GUI/KDE")
 
+# --- Configurazione CPack per pacchetto DEB (Debian/Ubuntu) ---
+# Selected with `cpack -G DEB`.
+set(CPACK_DEBIAN_PACKAGE_SECTION "kde")
+set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "plasma-workspace, qml6-module-org-kde-syntaxhighlighting")
+
 include(CPack)
